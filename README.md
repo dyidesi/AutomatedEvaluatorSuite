@@ -26,104 +26,170 @@ Most AI systems look fine in a demo and fail under systematic evaluation because
 ## 🏛️ System Architecture Diagrams
 
 ### 1. End-to-End Evaluation Suite Architecture
-This diagram illustrates the dual-run evaluation pipeline comparing the Week 3 baseline agent against the Week 4 improved agent swarm:
+This diagram outlines the complete quantitative evaluation harness: case hydration from the 1,000-case golden dataset, parallel execution across both swarms, multi-faceted evaluator scoring, and telemetry reporting:
 
 ```mermaid
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "darkMode": true,
+    "background": "#0b0f19",
+    "primaryColor": "#1e293b",
+    "primaryTextColor": "#f8fafc",
+    "primaryBorderColor": "#38bdf8",
+    "lineColor": "#64748b",
+    "secondaryColor": "#161e2e",
+    "tertiaryColor": "#0f172a",
+    "fontSize": "13px",
+    "fontFamily": "Inter, -apple-system, system-ui, sans-serif"
+  }
+}}%%
 flowchart TD
-    subgraph DataLayer["📁 Golden Dataset Layer (1,000 Cases)"]
-        GD1["Happy Path (500 cases / 50%)"]
-        GD2["Edge Cases (300 cases / 30%)"]
-        GD3["Known Failures (150 cases / 15%)"]
-        GD4["Adversarial Probes (50 cases / 5%)"]
+    subgraph S1["📂 1. Labeled Golden Dataset (1,000 Cases)"]
+        direction LR
+        D1(["🟢 Happy Path<br/>500 cases (50%)"])
+        D2(["🟡 Edge Cases<br/>300 cases (30%)"])
+        D3(["🔴 Known Failures<br/>150 cases (15%)"])
+        D4(["🟣 Adversarial Probes<br/>50 cases (5%)"])
     end
 
-    subgraph EvalRunner["⚙️ Automated Evaluation Engine (run_eval.py)"]
-        direction TB
-        DISPATCH["Case Dispatcher & State Hydration"]
-        
-        subgraph BaselineAgent["Baseline Agent Swarm (v1.0)"]
+    subgraph S2["⚡ 2. Dual-Track Execution Engine (run_eval.py)"]
+        direction LR
+        subgraph Baseline["Baseline Swarm (v1.0)"]
             B1["Raw Prompt Strategist"] --> B2["Sequential Writers"]
             B2 --> B3["Static Critic Node"]
         end
-        
-        subgraph ImprovedAgent["Improved Agent Swarm (v2.0)"]
-            I1["🛡️ Pre-Call Guardrail & PII Filter"] --> I2["🧠 Schema-Enforced Strategist"]
-            I2 --> I3["📚 Header-Aware RAG Indexer"]
-            I3 --> I4["✍️ Grounded Multi-Channel Writers"]
-            I4 --> I5["🧐 Critic QA Node"]
-            I5 -->|Feedback Loop| I4
+        subgraph Improved["Improved Swarm (v2.0)"]
+            I1["🛡️ Pre-Call Guardrails"] --> I2["🧠 Schema Strategist"]
+            I2 --> I3["📚 Header RAG"]
+            I3 --> I4["✍️ Grounded Writers"]
+            I4 --> I5["🧐 Dynamic Critic QA"]
+            I5 -.->|Feedback Loop| I4
         end
     end
 
-    subgraph EvaluatorBattery["🧪 Multi-Metric Evaluator Battery"]
-        E1["Code-Based: Pricing & Promo Accuracy (Exact/Regex)"]
-        E2["Code-Based: Key Feature Recall (Normalized Overlap)"]
-        E3["Code-Based: Task Completion & Structure (Asset Lengths)"]
-        E4["Safety: Guardrail & PII Redaction Audit (Token Scanner)"]
-        E5["LLM-as-a-Judge: Factual Faithfulness & Grounding (0-100)"]
+    subgraph S3["🧪 3. Multi-Metric Evaluator Battery"]
+        direction LR
+        E1["💰 Pricing & Promo Accuracy<br/><i>Exact token & regex match</i>"]
+        E2["🔍 Key Feature Recall<br/><i>Normalized term overlap</i>"]
+        E3["📋 Task Completion<br/><i>Asset structure & lengths</i>"]
+        E4["🛡️ Guardrail Compliance<br/><i>Injection & PII redactor</i>"]
+        E5["⚖️ Factual Faithfulness<br/><i>LLM-as-a-judge rubric (0-100)</i>"]
     end
 
-    subgraph TelemetryLayer["📡 Telemetry & Analytics"]
-        LS["LangSmith Cloud Tracing (Run Name, Tokens, Latency)"]
-        LOCAL_TRACE["Local Structured Trace Logs (JSON Schema)"]
-        CLUSTER["Failure Clustering & Root Cause Classifier"]
-        DELTA["Delta Calculator & Net Lift Engine"]
+    subgraph S4["📡 4. Telemetry & Analytics Engine"]
+        direction LR
+        T1["☁️ LangSmith Tracing<br/><i>Child runs, latency, tokens</i>"]
+        T2["💾 Offline Trace Logs<br/><i>JSON schema persistence</i>"]
+        T3["🔬 Failure Clustering<br/><i>Root cause classifier</i>"]
+        T4["📊 Delta Engine<br/><i>Measured lift calculation</i>"]
     end
 
-    subgraph ArtifactsLayer["📦 Deliverable Artifacts"]
-        XLSX["Multi-Tab Excel Workbook (eval_spreadsheet.xlsx)"]
-        CSV["Flat CSV Dataset (eval_spreadsheet.csv)"]
-        REPORT["Comprehensive Solution Report (EVALUATION_REPORT.md)"]
-        LOOM["Walkthrough Presentation Script (LOOM_WALKTHROUGH_SCRIPT.md)"]
+    subgraph S5["📦 5. Deliverables & Benchmark Reports"]
+        direction LR
+        A1[("📊 eval_spreadsheet.xlsx<br/>Multi-Tab Workbook")]
+        A2[("📈 eval_spreadsheet.csv<br/>Flat Dataset Export")]
+        A3[("📄 EVALUATION_REPORT.md<br/>Official Solution Document")]
+        A4[("🎬 LOOM_SCRIPT.md<br/>Walkthrough Script")]
     end
 
-    DataLayer --> DISPATCH
-    DISPATCH --> BaselineAgent
-    DISPATCH --> ImprovedAgent
-    BaselineAgent --> EvaluatorBattery
-    ImprovedAgent --> EvaluatorBattery
-    EvaluatorBattery --> TelemetryLayer
-    TelemetryLayer --> ArtifactsLayer
+    S1 ==> S2
+    Baseline ==> S3
+    Improved ==> S3
+    S3 ==> S4
+    S4 ==> S5
+
+    classDef datasetNode fill:#1e293b,stroke:#38bdf8,stroke-width:1.5px,color:#f8fafc;
+    classDef baseNode fill:#2d1b22,stroke:#f87171,stroke-width:1.5px,color:#fecaca;
+    classDef impNode fill:#142e2b,stroke:#34d399,stroke-width:1.5px,color:#d1fae5;
+    classDef evalNode fill:#1e1b4b,stroke:#818cf8,stroke-width:1.5px,color:#e0e7ff;
+    classDef telemNode fill:#2e1065,stroke:#c084fc,stroke-width:1.5px,color:#f3e8ff;
+    classDef artNode fill:#0f2922,stroke:#10b981,stroke-width:1.5px,color:#ecfdf5;
+
+    class D1,D2,D3,D4 datasetNode;
+    class B1,B2,B3 baseNode;
+    class I1,I2,I3,I4,I5 impNode;
+    class E1,E2,E3,E4,E5 evalNode;
+    class T1,T2,T3,T4 telemNode;
+    class A1,A2,A3,A4 artNode;
 ```
 
 ---
 
-### 2. The 4 Targeted Improvement Levers (v1.0 vs v2.0)
-This diagram illustrates the four engineering levers integrated into the improved agent swarm to overcome the baseline failure clusters:
+### 2. The 4 Targeted Improvement Levers (v1.0 vs. v2.0)
+This diagram illustrates how raw inputs pass through pre-call guardrails, structured schema harvesting, and header-aware RAG, before entering the writer swarm with active feedback-loop correction:
 
 ```mermaid
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "darkMode": true,
+    "background": "#0b0f19",
+    "primaryColor": "#1e293b",
+    "primaryTextColor": "#f8fafc",
+    "primaryBorderColor": "#38bdf8",
+    "lineColor": "#64748b",
+    "secondaryColor": "#161e2e",
+    "tertiaryColor": "#0f172a",
+    "fontSize": "13px",
+    "fontFamily": "Inter, -apple-system, system-ui, sans-serif"
+  }
+}}%%
 flowchart LR
-    subgraph RawInput["Input Document"]
-        DOC["Technical Product Brief / Spec"]
+    DOC[/"📄 Raw Product Spec<br/><i>(Unstructured MD / PDF)</i>"/]
+
+    subgraph L4["🛡️ Lever 4: Pre-Call Guardrails"]
+        G1["⚔️ Injection Deflector<br/><i>Neutralizes jailbreaks</i>"]
+        G2["🔒 PII / Credential Scrubber<br/><i>Redacts passwords & CCs</i>"]
     end
 
-    subgraph Lever4["Lever 4: Input Pre-Call Guardrails"]
-        G1["Injection Deflector<br/>('Disregard instructions')"]
-        G2["PII Redactor<br/>(Passwords, CCs, Phones)"]
+    subgraph L1["🧠 Lever 1: Schema Enforcement"]
+        P1["🏷️ Promo Harvester<br/><i>Extracts discount codes</i>"]
+        P2["💲 Strict Pricing Schema<br/><i>Binds pricing models</i>"]
     end
 
-    subgraph Lever1["Lever 1: Prompt & Schema Enforcement"]
-        P1["Regex Promo Harvester<br/>(Extracts PROMO20)"]
-        P2["Strict Pricing Schema<br/>(Binds exact tiers)"]
+    subgraph L2["📚 Lever 2: Retrieval Tuning"]
+        R1["📑 Header Sectioning<br/><i>Splits by H1, H2, H3</i>"]
+        R2["🎯 TF-IDF Boosting<br/><i>Prioritizes commercial keys</i>"]
     end
 
-    subgraph Lever2["Lever 2: Retrieval Tuning (RAG)"]
-        R1["Header-Aware Sectioning<br/>(#, ##, ###)"]
-        R2["TF-IDF Keyword Boosting<br/>(Features / Pricing)"]
+    subgraph WRITERS["✍️ Multi-Channel Writer Swarm"]
+        W1["LinkedIn Post"]
+        W2["Promo Email"]
+        W3["Ad Variations"]
+        W4["Launch Blog"]
     end
 
-    subgraph Lever3["Lever 3: QA Critic Feedback Loop"]
-        C1["Robust JSON Repair Parser"]
-        C2["Feedback Injection to Writers<br/>(Active Re-prompting)"]
+    subgraph L3["🧐 Lever 3: QA Critic Feedback Loop"]
+        C1["🛠️ Robust JSON Repair<br/><i>Prevents default pass</i>"]
+        C2["🔁 Active Re-Prompting<br/><i>Injects revision feedback</i>"]
     end
 
-    DOC --> Lever4
-    Lever4 --> Lever1
-    Lever1 --> Lever2
-    Lever2 --> Writers["Writer Agents<br/>(LinkedIn, Email, Ads, Blog)"]
-    Writers --> Lever3
-    Lever3 -->|Issues Flagged| Writers
-    Lever3 -->|QA Passed >= 80| Output["Verified Content Bundle"]
+    OUT[/"✨ Certified Content Bundle<br/><i>(100% Grounded & Verified)</i>"/]
+
+    DOC --> L4
+    L4 --> L1
+    L1 --> L2
+    L2 --> WRITERS
+    WRITERS --> L3
+    L3 -.->|Issues Flagged / Revisions| WRITERS
+    L3 -->|QA Passed Score >= 80| OUT
+
+    classDef rawDoc fill:#172554,stroke:#60a5fa,stroke-width:1.5px,color:#eff6ff;
+    classDef l4Style fill:#2e1065,stroke:#a855f7,stroke-width:1.5px,color:#faf5ff;
+    classDef l1Style fill:#1e1b4b,stroke:#818cf8,stroke-width:1.5px,color:#e0e7ff;
+    classDef l2Style fill:#0c4a6e,stroke:#38bdf8,stroke-width:1.5px,color:#f0f9ff;
+    classDef writerStyle fill:#1f2937,stroke:#9ca3af,stroke-width:1.5px,color:#f9fafb;
+    classDef l3Style fill:#064e3b,stroke:#34d399,stroke-width:1.5px,color:#ecfdf5;
+    classDef outStyle fill:#065f46,stroke:#10b981,stroke-width:2px,color:#ffffff;
+
+    class DOC rawDoc;
+    class G1,G2 l4Style;
+    class P1,P2 l1Style;
+    class R1,R2 l2Style;
+    class W1,W2,W3,W4 writerStyle;
+    class C1,C2 l3Style;
+    class OUT outStyle;
 ```
 
 ---
