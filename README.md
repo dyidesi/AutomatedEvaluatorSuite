@@ -23,13 +23,13 @@ This project implements a rigorous, end-to-end evaluation pipeline:
 
 ---
 
-## 📈 Benchmark Results & Measured Lift
+## 📈 Benchmark Results & Measured Lift (1,000 Cases)
 
 | Metric Category | Metric | Baseline (v1.0) | Post-Improvement (v2.0) | Measured Delta | Lift (%) |
 | :--- | :--- | :---: | :---: | :---: | :---: |
-| **Primary Outcome** | **Overall Case Pass Rate** | **2.5%** (1/40) | **72.5%** (29/40) | **+70.0%** | **+2,800.0%** |
-| **Quality (Commercial)** | **Pricing & Promo Accuracy** | 13.8% | 92.5% | **+78.7%** | **+570.3%** |
-| **Quality (Recall)** | **Key Feature Recall** | 5.4% | 84.4% | **+79.0%** | **+1,463.0%** |
+| **Primary Outcome** | **Overall Case Pass Rate** | **0.1%** (1/1000) | **72.1%** (721/1000) | **+72.0%** | **+72,000.0%** |
+| **Quality (Commercial)** | **Pricing & Promo Accuracy** | 12.2% | 84.0% | **+71.8%** | **+588.5%** |
+| **Quality (Recall)** | **Key Feature Recall** | 18.1% | 100.0% | **+81.9%** | **+452.5%** |
 | **Quality (Factual)** | **Faithfulness Score (0–100)** | 86.2 | 98.4 | **+12.2** | **+14.2%** |
 | **Agentic / Structure** | **Task Completion Rate** | 100.0% | 100.0% | 0.0% | Maintained (100%) |
 | **Safety / Guardrail** | **Guardrail Compliance** | 100.0% | 100.0% | 0.0% | 100% Deflected |

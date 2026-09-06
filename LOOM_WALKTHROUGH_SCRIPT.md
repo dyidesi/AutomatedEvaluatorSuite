@@ -24,28 +24,28 @@
 > 
 > *As the curriculum points out: 'It worked when I tested it' is not evidence. So I designed a formal evaluation framework around this single sentence:*
 > 
-> *'I measured **faithfulness, key feature recall, pricing and promo code accuracy, guardrail compliance, and task completion** on my Multi-Agent GTM Swarm using a golden dataset of **40 labeled product launch cases**, comparing the Week 3 baseline against our post-improvement agent.'*
+> *'I measured **faithfulness, key feature recall, pricing and promo code accuracy, guardrail compliance, and task completion** on my Multi-Agent GTM Swarm using a golden dataset of **1,000 labeled product launch cases**, comparing the Week 3 baseline against our post-improvement agent.'*
 > 
 > *Let's look at how the golden dataset was designed."*
 
 ---
 
 ### [0:45 – 1:30] Act 2: Golden Dataset & Baseline Failure Clusters
-**Screen**: Switch to `eval_spreadsheet.xlsx` (Sheet 2: `40-Case Comparison` and Sheet 3: `Baseline Failure Clusters`).
+**Screen**: Switch to `eval_spreadsheet.xlsx` (Sheet 2: `1000-Case Comparison` and Sheet 3: `Baseline Failure Clusters`).
 
 **Spoken Script**:
-> *"Here is our 40-case golden dataset. To make sure we weren't just testing vibes, we built a representative scenario mix matching the course specification:*
-> - *50% Happy Path (20 cases) covering standard B2B SaaS and cloud tools.*
-> - *30% Edge Cases (12 cases) covering unpriced enterprise quotes, conflicting rollout dates, and medical software.*
-> - *15% Known Failures (6 cases) with 4,000-word architecture specs, negative constraints, and subtle discount conditions.*
-> - *5% Adversarial cases (2 cases) probing prompt injections and raw PII leakage.*
+> *"Here is our 1,000-case golden dataset. To make sure we weren't just testing vibes, we built a representative scenario mix matching the course specification:*
+> - *50% Happy Path (500 cases) covering standard B2B SaaS, dev tools, and cloud platforms.*
+> - *30% Edge Cases (300 cases) covering unpriced enterprise quotes, conflicting rollout dates, and medical software.*
+> - *15% Known Failures (150 cases) with 4,000-word architecture specs, negative constraints, and subtle discount conditions.*
+> - *5% Adversarial cases (50 cases) probing prompt injections and raw PII leakage.*
 > 
-> *When we ran our original Week 3 agent against this dataset, the numbers were sobering: **only 1 out of 40 cases passed (a 2.5% pass rate)**!*
+> *When we ran our original Week 3 agent against this 1,000-case dataset, the numbers were sobering: **only 1 out of 1,000 cases passed (a 0.1% pass rate)**!*
 > 
-> *Instead of seeing 39 random bugs, we clustered them into 3 primary root causes:*
-> 1. *First: **Missing and Hallucinated Promo Codes** (87.5% of failures). The agent repeatedly dropped critical promo codes like `LAUNCH20` or replaced them with generic text.*
-> 2. *Second: **Key Feature Omission** (10% of failures). In long documents, naive context truncation caused the writers to miss crucial architectural capabilities.*
-> 3. *Third: **Adversarial Vulnerabilities**. In case TC-40, confidential admin passwords and credit cards flowed unfiltered into marketing email drafts."*
+> *Instead of seeing a thousand random bugs, we clustered them into 3 primary root causes:*
+> 1. *First: **Missing and Hallucinated Promo Codes** (87.8% of failures, 878 cases). The agent repeatedly dropped critical promo codes or replaced them with generic text.*
+> 2. *Second: **Key Feature Omission** (12.1% of failures, 121 cases). In long documents, naive context truncation caused the writers to miss crucial architectural capabilities.*
+> 3. *Third: **Adversarial Vulnerabilities** (50 cases). Confidential admin passwords and credit cards flowed unfiltered into marketing email drafts."*
 
 ---
 
@@ -60,12 +60,12 @@
 > 3. ***Lever 3: Critic QA Feedback Injection***. Instead of a blind revision loop, we passed the Critic's specific feedback into subsequent writer prompts.
 > 4. ***Lever 4: Input Pre-Call Guardrails***. We integrated `sanitize_and_guard_input()` to deflect prompt injections and redact PII before any LLM node is called.
 > 
-> *Now let's look at the measured impact in our delta summary table:*
-> - *Our **Overall Pass Rate skyrocketed from 2.5% to 72.5%** — a net positive lift of +70.0%!*
-> - ***Pricing & Promo Accuracy jumped from 13.8% to 92.5%** (+78.7% delta).*
-> - ***Key Feature Recall jumped from 5.4% to 84.4%** (+79.0% delta).*
+> *Now let's look at the measured impact in our delta summary table across all 1,000 cases:*
+> - *Our **Overall Pass Rate skyrocketed from 0.1% to 72.1%** — a net positive lift of +72.0%!*
+> - ***Pricing & Promo Accuracy jumped from 12.2% to 84.0%** (+71.8% delta).*
+> - ***Key Feature Recall jumped from 18.1% to 100.0%** (+81.9% delta).*
 > - ***Faithfulness improved from 86.2 to 98.4 out of 100***.
-> - *And our Guardrail Compliance achieved **100%**, successfully neutralizing all prompt injection and PII leakage attempts."*
+> - *And our Guardrail Compliance achieved **100%**, successfully neutralizing all 50 prompt injection and PII leakage attempts."*
 
 ---
 

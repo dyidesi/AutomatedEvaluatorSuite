@@ -116,7 +116,8 @@ def run_evaluation_suite(provider: str = "mock"):
     # -------------------------------------------------------------
     # PHASE 2 & 3: BASELINE RUN & FAILURE ANALYSIS
     # -------------------------------------------------------------
-    print("\n>>> [PHASE 1 & 2] Executing Baseline Agent across 40 Golden Cases...")
+    total_cases = len(GOLDEN_DATASET)
+    print(f"\n>>> [PHASE 1 & 2] Executing Baseline Agent across {total_cases} Golden Cases...")
     baseline_graph = build_gtm_graph(provider=provider)
     
     baseline_results = []
@@ -127,7 +128,8 @@ def run_evaluation_suite(provider: str = "mock"):
         baseline_results.append(eval_res)
         baseline_traces.append(trace)
         status = "PASS" if eval_res["case_passed"] else f"FAIL ({eval_res['failure_category']})"
-        print(f"  [{idx:02d}/40] {case['id']} ({case['scenario_type']:<13}) - {status}")
+        if idx <= 10 or idx % 100 == 0 or idx == total_cases:
+            print(f"  [{idx:04d}/{total_cases}] {case['id']} ({case['scenario_type']:<13}) - {status}")
         
     # Save baseline traces
     trace_baseline_file = os.path.join(parent_dir, "traces_baseline.json")
@@ -141,14 +143,14 @@ def run_evaluation_suite(provider: str = "mock"):
     
     failure_counts = baseline_df[~baseline_df["case_passed"]]["failure_category"].value_counts()
     print("\n--- BASELINE FAILURE CLUSTER ANALYSIS ---")
-    print(f"Baseline Overall Pass Rate: {baseline_pass_rate:.1f}% ({baseline_df['case_passed'].sum()}/40)")
+    print(f"Baseline Overall Pass Rate: {baseline_pass_rate:.1f}% ({baseline_df['case_passed'].sum()}/{total_cases})")
     for cat, count in failure_counts.items():
         print(f"  • {cat}: {count} cases ({count/len(baseline_df)*100:.1f}%)")
         
     # -------------------------------------------------------------
     # PHASE 4: POST-IMPROVEMENT RUN & DELTA MEASUREMENT
     # -------------------------------------------------------------
-    print("\n>>> [PHASE 4] Executing Improved Agent (4 Targeted Levers Applied)...")
+    print(f"\n>>> [PHASE 4] Executing Improved Agent across {total_cases} Golden Cases (4 Levers Applied)...")
     improved_graph = build_improved_gtm_graph(provider=provider)
     
     improved_results = []
@@ -159,7 +161,8 @@ def run_evaluation_suite(provider: str = "mock"):
         improved_results.append(eval_res)
         improved_traces.append(trace)
         status = "PASS" if eval_res["case_passed"] else f"FAIL ({eval_res['failure_category']})"
-        print(f"  [{idx:02d}/40] {case['id']} ({case['scenario_type']:<13}) - {status}")
+        if idx <= 10 or idx % 100 == 0 or idx == total_cases:
+            print(f"  [{idx:04d}/{total_cases}] {case['id']} ({case['scenario_type']:<13}) - {status}")
         
     # Save improved traces
     trace_improved_file = os.path.join(parent_dir, "traces_improved.json")
@@ -258,7 +261,7 @@ def run_evaluation_suite(provider: str = "mock"):
     xlsx_path = os.path.join(parent_dir, "eval_spreadsheet.xlsx")
     with pd.ExcelWriter(xlsx_path, engine="openpyxl") as writer:
         summary_df.to_excel(writer, sheet_name="Metrics & Deltas", index=False)
-        eval_df.to_excel(writer, sheet_name="40-Case Comparison", index=False)
+        eval_df.to_excel(writer, sheet_name="1000-Case Comparison", index=False)
         baseline_df[~baseline_df["case_passed"]]["failure_category"].value_counts().reset_index().rename(
             columns={"index": "Failure Cluster", "failure_category": "Count"}
         ).to_excel(writer, sheet_name="Baseline Failure Clusters", index=False)
